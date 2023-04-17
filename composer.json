@@ -1,0 +1,16 @@
+{
+  "name": "vendor_name/php-mqtt-pmas-client",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Zoltan Balogh",
+      "email": "zee.balogh@gmail.com"
+    }
+  ],
+
+  "require": {
+    "php-mqtt/client" : "1.1.1"
+  }
+}
