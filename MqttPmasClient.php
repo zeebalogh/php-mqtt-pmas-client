@@ -15,16 +15,16 @@ class MqttPmasClient {
 
   function __construct($server = 'mqtt.gatial.com', $port = 8883, $client_id = 'mqtt-client') {
 
-    pcntl_async_signals(true);
-
     try {
       $mqtt = new \PhpMqtt\Client\MqttClient($server, $port, $client_id);
       //echo("mqtt = $mqtt");
 
+      /*
       pcntl_signal(SIGINT, function (int $signal, $info) use ($mqtt) {
-        printf("Interrupted\n");
+        printf("MQTT Interrupted\n");
         $mqtt->interrupt();
       });
+      */
 
       $this->connectionSettings = (new ConnectionSettings)
         ->setUsername(null)
@@ -33,12 +33,10 @@ class MqttPmasClient {
         ->setUseTls(true)
         ->setTlsSelfSignedAllowed(true);
 
-      $mqtt->connect($this->connectionSettings, true);
-
       $this->mqtt = $mqtt;
 
     } catch (MqttClientException $e) {
-      printf('An exception occurred: %s\n', $e);
+      printf('MQTT Client Error: %s\n', $e);
     }
 
 
@@ -49,10 +47,23 @@ class MqttPmasClient {
     try {
 
       if (isset($this->mqtt))
-        $this->mqtt->disconnect();
+        if ($this->mqtt->isConnected())
+          $this->mqtt->disconnect();
+        else {
+          printf("Disconnecting: The connection was already interrupted.");
+        }
 
     } catch (MqttClientException $e) {
-      printf('An exception occurred: %s\n', $e);
+      printf('MQTT Disconnect Error: %s\n', $e);
+    }
+  }
+
+
+  function connect() {
+    try {
+      $this->mqtt->connect($this->connectionSettings, true);
+    } catch (MqttClientException $e) {
+      printf('MQTT Connect Error: %s\n', $e);
     }
   }
 

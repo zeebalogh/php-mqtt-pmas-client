@@ -15,8 +15,34 @@ const CLIENT_ID = 'mqtt-php-subscriber';
 
 class MqttSubscriber extends MqttPmasClient {
 
-  function __construct($server = 'mqtt.emerpoll.com', $port = 8883, $client_id = 'mqtt-client') {
-    parent::__construct($server, $port, $client_id);
+
+  function __construct($server = 'mqtt.gatial.com', $port = 8883, $client_id = 'pmas-mqtt-subscriber') {
+
+    pcntl_async_signals(true);
+
+    try {
+      $mqtt = new MqttClient($server, $port, $client_id);
+      //echo("mqtt = $mqtt");
+
+      pcntl_signal(SIGINT, function (int $signal, $info) use ($mqtt) {
+        printf("MQTT Interrupted\n");
+        $mqtt->interrupt();
+      });
+
+
+      $this->connectionSettings = (new ConnectionSettings)
+        ->setUsername(null)
+        ->setPassword(null)
+        ->setConnectTimeout(3)
+        ->setUseTls(true)
+        ->setTlsSelfSignedAllowed(true);
+
+      $this->mqtt = $mqtt;
+
+    } catch (MqttClientException $e) {
+      printf('MQTT Client Error: %s\n', $e);
+    }
+
   }
 
 
@@ -26,13 +52,12 @@ class MqttSubscriber extends MqttPmasClient {
 
       $mqtt = $this->mqtt;
 
-      $mqtt->connect($this->connectionSettings, true);
-
-      $mqtt->subscribe('silvanus/fire', function ($topic, $message) use ($mqtt) {
+      $mqtt->subscribe('silvanus/test', function ($topic, $message) use ($mqtt) {
 
         printf("Received message on topic [%s]: %s\n", $topic, $message);
 
 
+        /*
         if ($message == "quit") {
           printf("Quit\n");
           $mqtt->interrupt();
@@ -80,12 +105,13 @@ class MqttSubscriber extends MqttPmasClient {
                 $file = fopen('bids', 'a');
                 fwrite($file, $message . "\n");
                 printf("Bid Auction: %s, from: %s, value: %s\n", $json["auction_id"], $json["agent"], $json["value"]);
-                */
+                //
 
               }
 
-          }
+          } // */
       }, 0);
+
 
       // Another way how to handle incoming MQTT messages
       //    $handler = function (MqttClient $mqtt, string $topic, string $message, int $qualityOfService, bool $retained) {
@@ -99,7 +125,7 @@ class MqttSubscriber extends MqttPmasClient {
       $this->mqtt->disconnect();
 
     } catch (MqttClientException $e) {
-      printf('An exception occurred: %s\n', $e);
+      printf('MQTT Client Error: %s\n', $e);
     }
   }
 
@@ -109,9 +135,8 @@ class MqttSubscriber extends MqttPmasClient {
 /**
  * Main
  */
-
 pcntl_async_signals(true);
 
-$client = new MqttPmasClient();
-
+$client = new MqttSubscriber();
+$client->connect();
 $client->run();
