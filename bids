@@ -1,8 +1,0 @@
-{"action":"bid","owner":"pmas","agent":"matobl/Extruders/BauderAgent","auction_id":"pmas_1637777699860","value":5.24386363636363603291e+04,"COST":5.24386363636363603291e+04,"COMPLETION_TIME":4.79545454545454532536e+01}
-{"action":"bid","owner":"pmas","agent":"matobl/Extruders/BauderAgent","auction_id":"pmas_1637783744780","value":5.24386363636363603291e+04,"COST":5.24386363636363603291e+04,"COMPLETION_TIME":4.79545454545454532536e+01}
-{"action":"bid","owner":"pmas","agent":"matobl/Extruders/FormacAgent","auction_id":"pmas_1637852817181","value":5.22468461538461560849e+04,"COST":5.22468461538461560849e+04,"COMPLETION_TIME":4.15615384615384613198e+01}
-{"action":"bid","owner":"pmas","agent":"matobl/Extruders/BauderAgent","auction_id":"pmas_1637852817181","value":5.24386363636363603291e+04,"COST":5.24386363636363603291e+04,"COMPLETION_TIME":4.79545454545454532536e+01}
-{"action":"bid","owner":"pmas","agent":"matobl/Extruders/ReifAgent","auction_id":"pmas_1637852817181","value":5.27266666666666642413e+04,"COST":5.27266666666666642413e+04,"COMPLETION_TIME":5.75555555555555571345e+01}
-{"action":"bid","owner":"pmas","agent":"matobl/Extruders/BauderAgent","auction_id":"pmas_1637853053790","value":5.24386363636363603291e+04,"COST":5.24386363636363603291e+04,"COMPLETION_TIME":4.79545454545454532536e+01}
-{"action":"bid","owner":"pmas","agent":"matobl/Extruders/ReifAgent","auction_id":"pmas_1637853053790","value":5.27266666666666642413e+04,"COST":5.27266666666666642413e+04,"COMPLETION_TIME":5.75555555555555571345e+01}
-{"action":"bid","owner":"pmas","agent":"matobl/Extruders/FormacAgent","auction_id":"pmas_1637853053790","value":5.22468461538461560849e+04,"COST":5.22468461538461560849e+04,"COMPLETION_TIME":4.15615384615384613198e+01}

@@ -1,70 +1,45 @@
 <?php
 
 require __DIR__ . '/vendor/autoload.php';
+require "MqttPmasClient.php";
 
 use PhpMqtt\Client\MqttClient;
 use PhpMqtt\Client\ConnectionSettings;
 use PhpMqtt\Client\Exceptions\MqttClientException;
 
 
-pcntl_async_signals(true);
+const SERVER = 'mqtt.gatial.com';
+const PORT = 8883;                 // Alternative: 8084
+const CLIENT_ID = 'mqtt-php-subscriber';
 
-$server = 'mqtt.gatial.com';
-$port = 8883;
-#$port     = 8084;
-$clientId = 'mqtt-php';
-$bids = [];
 
-class MqttPmasClient {
+class MqttSubscriber extends MqttPmasClient {
 
-  private \PhpMqtt\Client\MqttClient $mqtt;
-  private $connectionSettings;
-
-  function __construct($server, $port, $clientId) {
-    try {
-      $mqtt = new \PhpMqtt\Client\MqttClient($server, $port, $clientId);
-
-      pcntl_signal(SIGINT, function (int $signal, $info) use ($mqtt) {
-        printf("Interrupted\n");
-        $mqtt->interrupt();
-      });
-
-      $this->connectionSettings = (new ConnectionSettings)
-        ->setUsername(null)
-        ->setPassword(null)
-        ->setConnectTimeout(3)
-        ->setUseTls(true)
-        ->setTlsSelfSignedAllowed(true);
-
-      $this->mqtt = $mqtt;
-
-    } catch (MqttClientException $e) {
-      printf('An exception occurred: %s\n', $e);
-    }
-
+  function __construct($server = 'mqtt.emerpoll.com', $port = 8883, $client_id = 'mqtt-client') {
+    parent::__construct($server, $port, $client_id);
   }
 
 
-  function run($topic, $message) {
-
+  function run() {
 
     try {
 
-
-      $this->mqtt->connect($this->connectionSettings, true);
       $mqtt = $this->mqtt;
 
-      $this->mqtt->subscribe('pmas', function ($topic, $message) use ($mqtt) {
+      $mqtt->connect($this->connectionSettings, true);
+
+      $mqtt->subscribe('silvanus/fire', function ($topic, $message) use ($mqtt) {
 
         printf("Received message on topic [%s]: %s\n", $topic, $message);
 
+
         if ($message == "quit") {
           printf("Quit\n");
-          $this->mqtt->interrupt();
+          $mqtt->interrupt();
         } else
 
           if ($message == "new") {
-            $this->mqtt->publish(
+            $mqtt->publish(
               'broker/master',
               '{\
                           "action" : "new", \ 
@@ -92,17 +67,22 @@ class MqttPmasClient {
             $json = json_decode($lastLine, true);
             $json['action'] = 'assign';
 
-            $this->mqtt->publish('broker/master', json_encode($json), 0);
+            $mqtt->publish('broker/master', json_encode($json), 0);
 
           } else {
 
             $json = json_decode($message, true);
 
-            if ($json["action"] == "bid") {
-              $file = fopen('bids', 'a');
-              fwrite($file, $message . "\n");
-              printf("Bid Auction: %s, from: %s, value: %s\n", $json["auction_id"], $json["agent"], $json["value"]);
-            }
+            if (isset($json))
+              if ($json["action"] == "bid") {
+
+                /*
+                $file = fopen('bids', 'a');
+                fwrite($file, $message . "\n");
+                printf("Bid Auction: %s, from: %s, value: %s\n", $json["auction_id"], $json["agent"], $json["value"]);
+                */
+
+              }
 
           }
       }, 0);
@@ -124,3 +104,14 @@ class MqttPmasClient {
   }
 
 }
+
+
+/**
+ * Main
+ */
+
+pcntl_async_signals(true);
+
+$client = new MqttPmasClient();
+
+$client->run();
